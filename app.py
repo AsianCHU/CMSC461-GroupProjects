@@ -148,6 +148,18 @@ def select_rental():
 
 
 def parse_and_validate(attr, value):
+    """
+    Parse and validate a user-entered value.
+
+    :param attr:
+        column name
+    :param value:
+        value to parse
+    :returns:
+        parsed value
+    :raises ValueError:
+        if parsing/validation failed
+    """
     if attr == "end_date":
         try:
             return datetime.strptime(value, DATE_FORMAT)
@@ -164,13 +176,18 @@ def parse_and_validate(attr, value):
     return value
 
 
-def record_menu(items):
+def record_menu(items) -> bool:
     """
     Display a menu listing different database operations for a record type.
     * Insert
     * Select
     * Delete
     * Return to Main Menu
+
+    :param items:
+        menu item tuples containing label, database function, and column names
+    :returns:
+        False to close this submenu, or True to continue
     """
     try:
         # Display labels for database operations (insert, select, delete)
@@ -219,6 +236,10 @@ def record_menu(items):
     return True
 
 
+# Menu items
+# Top-level tuples are: (label, submenu items)
+# Submenu item tuples are: (label, database function, and column names)
+# Submenu items with None as database function are used to exit the submenu
 MENU_ITEMS = [
     (
         "Agency",
@@ -254,7 +275,7 @@ MENU_ITEMS = [
             ("Delete Rental", delete_rental, ("rental_id",)),
             # Display agencies (QoL for looking up agency ID)
             ("Select Agency", select_agency, None),
-            # Display offices (QoL for looking up office ID)
+            # Display offices (QoL for looking up office name)
             ("Select Office", getOffice, None),
             ("Return to Main Menu", None, None),
         ],
