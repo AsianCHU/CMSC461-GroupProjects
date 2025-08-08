@@ -6,11 +6,42 @@ DATE_FORMAT = "%m-%d-%y"
 quitApp = False
 
 db_name = "project.db"
+
+
+# Row factory that returns each row as a dict with column names mapped to values
+# https://docs.python.org/3/library/sqlite3.html
+def dict_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
+
+
 connection = sqlite3.connect(db_name)
+connection.row_factory = dict_factory
 # Enable foreign key support
 # https://sqlite.org/foreignkeys.html
 connection.execute("PRAGMA foreign_keys = 1")
 cursor = connection.cursor()
+
+
+def dict_factory(cursor, row):
+    fields = [column[0] for column in cursor.description]
+    return {key: value for key, value in zip(fields, row)}
+
+
+def print_rows(rows):
+    if not rows:
+        print("No row results.")
+        return
+
+    col_count = max([len(x) for x in rows])
+    # Rental end_date in ISO format is 19 characters long
+    row_format = "{:>20}  " * col_count
+
+    # Print column headers
+    print(row_format.format(*rows[0].keys()))
+    for row in rows:
+        # Print row values
+        print(row_format.format(*[str(x)[:20] for x in row.values()]))
 
 
 def delete_agency(agency_name: str):
@@ -40,7 +71,7 @@ def select_agency():
     try:
         cursor.execute("SELECT * FROM agency")
         rows = cursor.fetchall()
-        print(rows)
+        print_rows(rows)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -60,7 +91,7 @@ def getOffice():
     try:
         cursor.execute("SELECT * FROM office")
         rows = cursor.fetchall()
-        print(rows)
+        print_rows(rows)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -116,7 +147,7 @@ def select_rental():
     try:
         cursor.execute("SELECT * FROM rental")
         rows = cursor.fetchall()
-        print(rows)
+        print_rows(rows)
     except Exception as e:
         print(f"Error: {e}")
 
