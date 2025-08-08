@@ -1,12 +1,22 @@
-Placeholder readme probably for the schema
+# **CMSC 461 SOAP Database Project**
 
+The guidelines for this project is to develop a **System for Occupancy Agreement Processing (SOAP)** app using SQLite3 and Python. 
 
-To clone, download github desktop and login
-Hit file on the top left corner and hit clone repository
-Select the local folder you want the repository saved to and select this repo to clone
+The Python script allows the user to do the following functions:
 
-Notes:
-Make sure to check the github for any changes and pull those changes onto local by hitting repository at the top of github
-desktop and press pull
+* Insert a record into the tables
+* Delete a record from the tables
+* Select records from the tables
 
-Make sure you always push any changes and make notes on what you did (github desktop wont even let you push without a description anyways)
+To run this project, gitbash, WSL, CMD, and Powershell all work with this; Run this command:
+```
+$ Python app.py
+```
+Which you will be greated with a menu to select from.
+
+## Schema for the database file
+![alt text](https://github.com/AsianCHU/CMSC461-GroupProjects/blob/main/461projDiagram.jpg)
+
+## Credits
+
+This is a repository for our database project developed by Dave, Ahad, Djin, Tony, and Abdullah.
