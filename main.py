@@ -11,7 +11,7 @@ except sqlite3.Error as e:
     exit()
 
 def insert_office(office_name, city, area):
-    cursor.execute('INSERT INTO office (office_name, city, area) VALUES (?, ?, ?)', 
+    cursor.execute('INSERT OR IGNORE INTO office (office_name, city, area) VALUES (?, ?, ?)', 
     (office_name, city, area))
     connection.commit()
 
@@ -34,7 +34,7 @@ def delete_agency(agency_name):
 
 def insert_agency(agency_name, address, city, phone):
     cursor.execute(
-        "INSERT INTO agency (agency_name, address, city, phone) VALUES (?, ?, ?, ?)",
+        "INSERT OR IGNORE INTO agency (agency_name, address, city, phone) VALUES (?, ?, ?, ?)",
         [agency_name, address, city, phone],
     )
     connection.commit()
@@ -60,13 +60,14 @@ def insert_rental(agency_id, office_name, amount, end_date):
     end_date = end_date.isoformat()
 
     cursor.execute(
-        "INSERT INTO rental (office_name, amount, end_date) VALUES (?, ?, ?)",
+        "INSERT OR IGNORE INTO rental (office_name, amount, end_date) VALUES (?, ?, ?)",
         [office_name, amount, end_date],
     )
 
     rental_id = cursor.lastrowid
+    
     cursor.execute(
-        "INSERT INTO agency_and_rental (agency_id, rental_id) VALUES (?, ?)",
+        "INSERT or IGNORE INTO agency_and_rental (agency_id, rental_id) VALUES (?, ?)",
         [agency_id, rental_id],
     )
 
