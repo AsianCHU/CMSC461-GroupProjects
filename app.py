@@ -103,11 +103,11 @@ def deleteOffice(name):
 def delete_rental(rental_id: int):
     try:
         cursor.execute(
-            "DELETE FROM rental WHERE rental_id = ?",
+            "DELETE FROM agency_and_rental WHERE rental_id = ?",
             [rental_id],
         )
         cursor.execute(
-            "DELETE FROM agency_and_rental WHERE rental_id = ?",
+            "DELETE FROM rental WHERE rental_id = ?",
             [rental_id],
         )
         print(f"{cursor.rowcount} rows deleted.")
@@ -176,151 +176,92 @@ def parse_and_validate(attr, value):
     return value
 
 
-def record_menu(items) -> bool:
-    """
-    Display a menu listing different database operations for a record type.
-    * Insert
-    * Select
-    * Delete
-    * Return to Main Menu
-
-    :param items:
-        menu item tuples containing label, database function, and column names
-    :returns:
-        False to close this submenu, or True to continue
-    """
-    try:
-        # Display labels for database operations (insert, select, delete)
-        for i, (label, _, _) in enumerate(items):
-            print(f"{i+1}) {label}")
-
-        choice = int(input("> ")) - 1
-
-        (label, db_op, attrs) = items[choice]
-
-        if not db_op:
-            return False
-
-        print(label)
-
-        values = []
-        if attrs:
-            # Get each column value from user
-            for attr in attrs:
-                # Loop until user value passes parsing and validation
-                while True:
-                    try:
-                        value = input(f"{attr.capitalize().replace('_', ' ')}: ")
-                        value = parse_and_validate(attr, value)
-                        values.append(value)
-                        break
-                    except KeyboardInterrupt:
-                        # Print a blank line after ^C
-                        print()
-                        # Allow Ctrl+C to cancel inputting values and continue from submenu
-                        return True
-                    except ValueError as e:
-                        # Ignore values that fail parsing and validation
-                        continue
-
-        db_op(*values)
-    except KeyboardInterrupt:
-        # Print a blank line after ^C
-        print()
-        # Allow Ctrl+C to exit submenu
-        return False
-    except ValueError:
-        # Ignore invalid menu choices
-        pass
-
-    return True
-
-
 # Menu items
 # Top-level tuples are: (label, submenu items)
 # Submenu item tuples are: (label, database function, and column names)
 # Submenu items with None as database function are used to exit the submenu
 MENU_ITEMS = [
     (
-        "Agency",
-        [
-            (
-                "Insert Agency",
-                insert_agency,
-                ("agency_name", "address", "city", "phone"),
-            ),
-            ("Select Agency", select_agency, None),
-            ("Delete Agency", delete_agency, ("agency_name",)),
-            ("Return to Main Menu", None, None),
-        ],
+        "Insert Agency",
+        insert_agency,
+        ("agency_name", "address", "city", "phone"),
     ),
+    ("Select Agency", select_agency, None),
+    ("Delete Agency", delete_agency, ("agency_name",)),
+    ("Insert Office", insertOffice, ("office_name", "city", "area")),
+    ("Select Office", getOffice, None),
+    ("Delete Office", deleteOffice, ("office_name",)),
     (
-        "Office",
-        [
-            ("Insert Office", insertOffice, ("office_name", "city", "area")),
-            ("Select Office", getOffice, None),
-            ("Delete Office", deleteOffice, ("office_name",)),
-            ("Return to Main Menu", None, None),
-        ],
+        "Insert Rental",
+        insert_rental,
+        ("agency_id", "office_name", "amount", "end_date"),
     ),
-    (
-        "Rental Agreement",
-        [
-            (
-                "Insert Rental",
-                insert_rental,
-                ("agency_id", "office_name", "amount", "end_date"),
-            ),
-            ("Select Rental", select_rental, None),
-            ("Delete Rental", delete_rental, ("rental_id",)),
-            # Display agencies (QoL for looking up agency ID)
-            ("Select Agency", select_agency, None),
-            # Display offices (QoL for looking up office name)
-            ("Select Office", getOffice, None),
-            ("Return to Main Menu", None, None),
-        ],
-    ),
-    (
-        "Quit",
-        None,
-    ),
+    ("Select Rental", select_rental, None),
+    ("Delete Rental", delete_rental, ("rental_id",)),
 ]
+
+
+def execute_db_operation(db_op, attrs):
+    values = []
+    if attrs:
+        # Get each column value from user
+        for attr in attrs:
+            # Loop until user value passes parsing and validation
+            while True:
+                try:
+                    value = input(f"{attr.capitalize().replace('_', ' ')}: ")
+                    value = parse_and_validate(attr, value)
+                    values.append(value)
+                    break
+                except KeyboardInterrupt:
+                    # Print a blank line after ^C
+                    print()
+                    # Allow Ctrl+C to cancel inputting values without exiting app
+                    return
+                except ValueError as e:
+                    # Ignore values that fail parsing and validation
+                    continue
+
+    db_op(*values)
 
 
 def main_menu():
     """
-    Display a menu listing different record types.
-    * Agency
-    * Office
-    * Rental
-    * Quit
+    Display a menu listing database operations for different record types.
     """
     while True:
         try:
-            print("Please select a record type.")
+            print("- GSA Database -")
 
             # Display labels for menu items
-            for i, (label, _) in enumerate(MENU_ITEMS):
+            for i, (label, _, _) in enumerate(MENU_ITEMS):
                 print(f"{i+1}) {label}")
 
+            print("q) Quit")
+
             # Convert user input to array index
-            choice = int(input("> ")) - 1
+            choice = input("> ")
 
-            (label, items) = MENU_ITEMS[choice]
-
-            if items:
-                # Loop record menu until user exits it
-                while record_menu(items):
-                    pass
-            else:
-                # Exit menu when items are not specified
+            # Check for quit choice
+            if choice.strip().lower() in ("0", "q"):
                 return
+
+            (label, db_op, attrs) = MENU_ITEMS[int(choice) - 1]
+
+            if db_op:
+                print(f"{label}? (Ctrl+C to cancel)")
+                execute_db_operation(db_op, attrs)
+            else:
+                return
+        except IndexError:
+            # Ignore invalid menu choices
+            pass
         except KeyboardInterrupt:
             # Print a blank line after ^C
             print()
-            # Allow Ctrl+C to exit
             return
-        except:
+        except ValueError:
+            # Ignore invalid menu choices
             pass
 
 
