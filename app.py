@@ -177,34 +177,49 @@ def record_menu(items):
     * Delete
     * Return to Main Menu
     """
-    # Display labels for database operations (insert, select, delete)
-    for i, (label, _, _) in enumerate(items):
-        print(f"{i+1}) {label}")
+    try:
+        # Display labels for database operations (insert, select, delete)
+        for i, (label, _, _) in enumerate(items):
+            print(f"{i+1}) {label}")
 
-    choice = int(input("> ")) - 1
+        choice = int(input("> ")) - 1
 
-    (label, db_op, attrs) = items[choice]
+        (label, db_op, attrs) = items[choice]
 
-    if not db_op:
+        if not db_op:
+            return False
+
+        print(label)
+
+        values = []
+        if attrs:
+            # Get each column value from user
+            for attr in attrs:
+                # Loop until user value passes parsing and validation
+                while True:
+                    try:
+                        value = input(f"{attr.capitalize().replace('_', ' ')}: ")
+                        value = parse_and_validate(attr, value)
+                        values.append(value)
+                        break
+                    except KeyboardInterrupt:
+                        # Print a blank line after ^C
+                        print()
+                        # Allow Ctrl+C to cancel inputting values and continue from submenu
+                        return True
+                    except ValueError as e:
+                        # Ignore values that fail parsing and validation
+                        continue
+
+        db_op(*values)
+    except KeyboardInterrupt:
+        # Print a blank line after ^C
+        print()
+        # Allow Ctrl+C to exit submenu
         return False
-
-    print(label)
-
-    values = []
-    if attrs:
-        # Get each column value from user
-        for attr in attrs:
-            # Loop until user value passes parsing and validation
-            while True:
-                value = input(f"{attr.capitalize().replace('_', ' ')}: ")
-                try:
-                    value = parse_and_validate(attr, value)
-                    values.append(value)
-                    break
-                except ValueError as e:
-                    continue
-
-    db_op(*values)
+    except ValueError:
+        # Ignore invalid menu choices
+        pass
 
     return True
 
@@ -265,23 +280,32 @@ def main_menu():
     * Quit
     """
     while True:
-        print("Please select a record type.")
+        try:
+            print("Please select a record type.")
 
-        # Display labels for menu items
-        for i, (label, _) in enumerate(MENU_ITEMS):
-            print(f"{i+1}) {label}")
+            # Display labels for menu items
+            for i, (label, _) in enumerate(MENU_ITEMS):
+                print(f"{i+1}) {label}")
 
-        choice = int(input("> ")) - 1
+            # Convert user input to array index
+            choice = int(input("> ")) - 1
 
-        (label, items) = MENU_ITEMS[choice]
+            (label, items) = MENU_ITEMS[choice]
 
-        if items:
-            # Loop record menu until user exits it
-            while record_menu(items):
-                pass
-        else:
-            # Exit menu when items are not specified
+            if items:
+                # Loop record menu until user exits it
+                while record_menu(items):
+                    pass
+            else:
+                # Exit menu when items are not specified
+                return
+        except KeyboardInterrupt:
+            # Print a blank line after ^C
+            print()
+            # Allow Ctrl+C to exit
             return
+        except:
+            pass
 
 
 main_menu()
