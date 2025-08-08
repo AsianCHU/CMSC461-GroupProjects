@@ -23,11 +23,6 @@ connection.execute("PRAGMA foreign_keys = 1")
 cursor = connection.cursor()
 
 
-def dict_factory(cursor, row):
-    fields = [column[0] for column in cursor.description]
-    return {key: value for key, value in zip(fields, row)}
-
-
 def print_rows(rows):
     if not rows:
         print("No row results.")
