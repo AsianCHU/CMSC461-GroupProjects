@@ -20,10 +20,10 @@ CREATE TABLE rental (
     FOREIGN KEY (office_name) REFERENCES office(office_name)
 );
 
-CREATE TABLE agency_and_rental {
+CREATE TABLE agency_and_rental (
     agency_id INTEGER,
     rental_id INTEGER,
     PRIMARY KEY(agency_id, rental_id),
     FOREIGN KEY (agency_id) REFERENCES agency(agency_id),
     FOREIGN KEY (rental_id) REFERENCES rental(rental_id)
-}
+);
