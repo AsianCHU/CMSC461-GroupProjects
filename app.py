@@ -164,7 +164,7 @@ def parse_and_validate(attr, value):
         try:
             return datetime.strptime(value, DATE_FORMAT)
         except ValueError as e:
-            print(f'Dates should be in "MONTH-DAY-YEAR" format.')
+            print(f'Dates should be in "MM-DD-YY" format (two-digit month-day-year).')
             raise ValueError()
     elif attr in ("agency_id"):
         try:
