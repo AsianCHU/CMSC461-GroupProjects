@@ -71,7 +71,7 @@ def select_agency():
         print(f"Error: {e}")
 
 
-def insertOffice(name: str, city: str, area: int):
+def insert_office(name: str, city: str, area: int):
     try:
         cursor.execute(
             "INSERT INTO office (office_name, city, area) VALUES (?, ?, ?)",
@@ -82,20 +82,20 @@ def insertOffice(name: str, city: str, area: int):
         print(f"Error: {e}")
 
 
-def getOffice():
-    try:
-        cursor.execute("SELECT * FROM office")
-        rows = cursor.fetchall()
-        print_rows(rows)
-    except Exception as e:
-        print(f"Error: {e}")
-
-
-def deleteOffice(name):
+def delete_office(name):
     try:
         cursor.execute("DELETE FROM office WHERE office_name = ?", [name])
         print(f"{cursor.rowcount} rows deleted.")
         connection.commit()
+    except Exception as e:
+        print(f"Error: {e}")
+
+
+def select_office():
+    try:
+        cursor.execute("SELECT * FROM office")
+        rows = cursor.fetchall()
+        print_rows(rows)
     except Exception as e:
         print(f"Error: {e}")
 
@@ -188,9 +188,9 @@ MENU_ITEMS = [
     ),
     ("Select Agency", select_agency, None),
     ("Delete Agency", delete_agency, ("agency_name",)),
-    ("Insert Office", insertOffice, ("office_name", "city", "area")),
-    ("Select Office", getOffice, None),
-    ("Delete Office", deleteOffice, ("office_name",)),
+    ("Insert Office", insert_office, ("office_name", "city", "area")),
+    ("Select Office", select_office, None),
+    ("Delete Office", delete_office, ("office_name",)),
     (
         "Insert Rental",
         insert_rental,
