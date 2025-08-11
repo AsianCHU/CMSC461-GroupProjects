@@ -133,10 +133,13 @@ while True:
         year = int(input("Enter end year (YYYY): "))
         month = int(input("Enter end month (MM): "))
         day = int(input("Enter end day (DD): "))
-        end_date = date(year, month, day)
 
-        insert_rental(agency_id, office_name, amount, end_date)
-        print("Data in Rental inserted")
+        try:
+            end_date = date(year, month, day)
+            insert_rental(agency_id, office_name, amount, end_date)
+            print("Data in Rental inserted")
+        except ValueError:
+            print("Error with inserting data...")
         
     elif choice == "8":
         print("Rentals:")
